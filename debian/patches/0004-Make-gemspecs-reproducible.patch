@@ -45,5 +45,5 @@ index 8c92908..0e6c0c7 100644
    s.name = "rdoc"
 +  s.date = RUBY_RELEASE_DATE
    s.version = RDoc::VERSION
-   s.date = "2017-12-24"
  
+   s.authors = [
