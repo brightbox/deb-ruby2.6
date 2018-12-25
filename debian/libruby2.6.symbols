@@ -1,4 +1,4 @@
-libruby-2.5.so.2.5 libruby2.5 #MINVER#
+libruby-2.6.so.2.6 libruby2.6 #MINVER#
  OnigDefaultCaseFoldFlag@Base 2.5.0~preview1
  OnigDefaultSyntax@Base 2.5.0~preview1
  OnigEncAsciiCtypeTable@Base 2.5.0~preview1

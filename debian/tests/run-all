@@ -35,7 +35,7 @@ excludes="$excludes --excludes-dir=debian/tests/excludes/any/"
 excludes="$excludes --excludes-dir=debian/tests/excludes/$(dpkg-architecture -qDEB_HOST_ARCH)/"
 
 for t in $tests; do
-  if ruby2.5 test/runner.rb -v $excludes --name='!/memory_leak/' $t >log 2>&1; then
+  if ruby2.6 test/runner.rb -v $excludes --name='!/memory_leak/' $t >log 2>&1; then
     echo "PASS $t"
     pass=$(($pass + 1))
   else
