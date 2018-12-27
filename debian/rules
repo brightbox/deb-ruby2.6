@@ -10,7 +10,9 @@ export DH_OPTIONS
 TESTOPTS += -v
 export TESTOPTS
 
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 include /usr/share/dpkg/pkg-info.mk
@@ -61,7 +63,7 @@ excludes += --excludes-dir=debian/tests/excludes/any/
 excludes += --excludes-dir=debian/tests/excludes/$(DEB_HOST_ARCH)/
 override_dh_auto_test-arch:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	$(MAKE) check V=1 RUBY_TESTOPTS=-v TESTS="$(excludes)"
+	$(MAKE) check V=1 RUBY_TESTOPTS=-v TESTS="$(excludes)" OPENSSL_CONF=/dev/null
 endif
 
 override_dh_auto_install-arch:
@@ -95,6 +97,7 @@ override_dh_auto_build-indep:
 
 override_dh_auto_install-indep:
 	$(MAKE) install-doc V=1 DESTDIR=$(CURDIR)/debian/ruby$(RUBY_VERSION)-doc
+	find $(CURDIR)/debian/ruby$(RUBY_VERSION)-doc -name created.rid -delete
 
 override_dh_install-arch:
 	# install SystemTap tapfile
