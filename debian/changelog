@@ -1,8 +1,10 @@
-ruby2.6 (2.6.0-1bbox1~bionic1) bionic; urgency=low
+ruby2.6 (2.6.0-1bbox11~bionic1) bionic; urgency=low
 
   * New upstream release 2.6.0
+  * Gemspecs are now reproducible by default, patches dropped
+  * Minor improvements from Debian packaging recipes
 
- -- John Leach <john@brightbox.co.uk>  Tue, 25 Dec 2018 16:50:27 +0000
+ -- John Leach <john@brightbox.co.uk>  Fri, 28 Dec 2018 18:12:18 +0000
 
 ruby2.5 (2.5.3-1bbox1~xenial1) xenial; urgency=medium
 
