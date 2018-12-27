@@ -1,0 +1,113 @@
+From 5116f878fc3d21b3698b8771783939fda0dec4c1 Mon Sep 17 00:00:00 2001
+From: John Leach <john@johnleach.co.uk>
+Date: Thu, 27 Dec 2018 00:46:18 +0000
+Subject: [PATCH] Fix tests broken by a SOURCE_DATE_EPOCH env var
+
+This fixes several tests that are broken when the SOURCE_DATE_EPOCH environment
+variable is set. TestGemPackageTarWriter was a bit complicated so I just unset
+the env var for the duration of the tests, and restored it.
+---
+ test/rubygems/test_gem_package_tar_writer.rb |  3 +++
+ test/rubygems/test_gem_specification.rb      | 18 +++++++++++++-----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/test/rubygems/test_gem_package_tar_writer.rb b/test/rubygems/test_gem_package_tar_writer.rb
+index 408db07de7..ccbdbc92a8 100644
+--- a/test/rubygems/test_gem_package_tar_writer.rb
++++ b/test/rubygems/test_gem_package_tar_writer.rb
+@@ -11,11 +11,14 @@ def setup
+     @data = 'abcde12345'
+     @io = TempIO.new
+     @tar_writer = Gem::Package::TarWriter.new @io
++    @backup_epoch = ENV["SOURCE_DATE_EPOCH"]
++    ENV["SOURCE_DATE_EPOCH"] = nil
+   end
+ 
+   def teardown
+     @tar_writer.close unless @tar_writer.closed?
+     @io.close!
++    ENV["SOURCE_DATE_EPOCH"] = @backup_epoch
+ 
+     super
+   end
+diff --git a/test/rubygems/test_gem_specification.rb b/test/rubygems/test_gem_specification.rb
+index 8deb211798..cb5fc8e05e 100644
+--- a/test/rubygems/test_gem_specification.rb
++++ b/test/rubygems/test_gem_specification.rb
+@@ -95,6 +95,8 @@ def setup
+ 
+     @current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
+ 
++    @gem_spec_today = ENV["SOURCE_DATE_EPOCH"] ? Time.at(ENV["SOURCE_DATE_EPOCH"].to_i) : Gem::Specification::TODAY
++
+     load 'rubygems/syck_hack.rb'
+   end
+ 
+@@ -1033,7 +1035,8 @@ def test_self_load_legacy_ruby
+     end
+     assert_equal 'keyedlist', spec.name
+     assert_equal '0.4.0', spec.version.to_s
+-    assert_equal Gem::Specification::TODAY, spec.date
++    spec_date = @gem_spec_today
++    assert_equal Time.utc(spec_date.year, spec_date.month, spec_date.day), spec.date
+     assert spec.required_ruby_version.satisfied_by?(Gem::Version.new('1'))
+     assert_equal false, spec.has_unit_tests?
+   end
+@@ -1674,7 +1677,10 @@ def test_contains_requirable_file_eh_extension
+   end
+ 
+   def test_date
++    backup_epoch = ENV["SOURCE_DATE_EPOCH"]
++    ENV["SOURCE_DATE_EPOCH"] = nil
+     assert_equal Gem::Specification::TODAY, @a1.date
++    ENV["SOURCE_DATE_EPOCH"] = backup_epoch
+   end
+ 
+   def test_date_equals_date
+@@ -1719,8 +1725,10 @@ def test_date_tolerates_hour_sec_and_timezone
+   end
+ 
+   def test_date_use_env_source_date_epoch
++    backup_epoch = ENV["SOURCE_DATE_EPOCH"]
+     ENV["SOURCE_DATE_EPOCH"] = "123456789"
+     assert_equal Time.utc(1973,11,29,0,0,0), @a1.date
++    ENV["SOURCE_DATE_EPOCH"] = backup_epoch
+   end
+ 
+   def test_dependencies
+@@ -2387,7 +2395,7 @@ def test_to_ruby
+   s.required_rubygems_version = Gem::Requirement.new(\"> 0\".freeze) if s.respond_to? :required_rubygems_version=
+   s.require_paths = ["lib".freeze, "other".freeze]
+   s.authors = ["A User".freeze]
+-  s.date = "#{Gem::Specification::TODAY.strftime "%Y-%m-%d"}"
++  s.date = "#{@gem_spec_today.strftime "%Y-%m-%d"}"
+   s.description = "This is a test description".freeze
+   s.email = "example@example.com".freeze
+   s.files = ["lib/code.rb".freeze]
+@@ -2436,7 +2444,7 @@ def test_to_ruby_for_cache
+   s.required_rubygems_version = Gem::Requirement.new(\"> 0\".freeze) if s.respond_to? :required_rubygems_version=
+   s.require_paths = ["lib".freeze]
+   s.authors = ["A User".freeze]
+-  s.date = "#{Gem::Specification::TODAY.strftime "%Y-%m-%d"}"
++  s.date = "#{@gem_spec_today.strftime "%Y-%m-%d"}"
+   s.description = "This is a test description".freeze
+   s.email = "example@example.com".freeze
+   s.homepage = "http://example.com".freeze
+@@ -2493,7 +2501,7 @@ def test_to_ruby_fancy
+   s.required_rubygems_version = Gem::Requirement.new(\">= 0\".freeze) if s.respond_to? :required_rubygems_version=
+   s.require_paths = ["lib".freeze]
+   s.authors = ["A User".freeze]
+-  s.date = "#{Gem::Specification::TODAY.strftime "%Y-%m-%d"}"
++  s.date = "#{@gem_spec_today.strftime "%Y-%m-%d"}"
+   s.description = "This is a test description".freeze
+   s.email = "example@example.com".freeze
+   s.executables = ["exec".freeze]
+@@ -3573,7 +3581,7 @@ def test_metadata_specs
+   s.metadata = { "one" => "two", "two" => "three" } if s.respond_to? :metadata=
+   s.require_paths = ["lib".freeze]
+   s.authors = ["A User".freeze]
+-  s.date = "#{Gem::Specification::TODAY.strftime("%Y-%m-%d")}"
++  s.date = "#{@gem_spec_today.strftime("%Y-%m-%d")}"
+   s.description = "This is a test description".freeze
+   s.email = "example@example.com".freeze
+   s.files = ["lib/code.rb".freeze]
