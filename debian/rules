@@ -45,13 +45,10 @@ export SHELL := /bin/bash
 	dh $@
 
 override_dh_auto_configure:
-	cp /usr/share/misc/config.guess tool
-	cp /usr/share/misc/config.sub tool
 	./configure $(configure_options)
 
 override_dh_auto_clean:
 	dh_auto_clean
-	rm -f tool/config.guess tool/config.sub
 	$(RM) test/excludes/$(DEB_HOST_ARCH)
 	$(RM) -r .ext
 	$(RM) -r doc/capi
