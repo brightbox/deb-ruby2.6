@@ -1,3 +1,10 @@
+ruby2.6 (2.6.2-1bbox1~bionic1) bionic; urgency=medium
+
+  * New upstream release 2.6.2
+  * Fixes CVE-2019-8320 through 8325 with Rubygems update.
+
+ -- John Leach <john@brightbox.co.uk>  Fri, 15 Mar 2019 10:59:02 +0000
+
 ruby2.6 (2.6.1-1bbox11~bionic1) bionic; urgency=medium
 
   * New upstream release, 2.6.1
