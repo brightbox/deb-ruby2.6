@@ -1,4 +1,3 @@
 0001-rdoc-build-reproducible-documentation.patch
 0002-lib-mkmf.rb-sort-list-of-object-files-in-generated-M.patch
-0005-fix-tests-broken-by-program-suffix.patch
 0006-fix-tests-broken-by-source-date-epoch.patch
